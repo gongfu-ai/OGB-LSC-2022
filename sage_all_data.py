@@ -14,8 +14,7 @@ import time
 from tqdm import tqdm
 import torch
 
-
-class MAG240M(object):
+class UniMP(object):
     """Iterator"""
     def __init__(self, data_dir):
         self.data_dir = data_dir
@@ -44,14 +43,11 @@ class MAG240M(object):
             log.info(f'Done! [{time.perf_counter() - t:.2f}s]')
         os.system("ln -s node_feat.npy ogb-arxiv/full_feat.npy")
         os.system("ln -s node_year.npy ogb-arxiv/all_feat_year.npy")
-    
-        
-        
                 
 if __name__ == "__main__":
     root = 'dataset_path'
     print(root)
-    dataset = MAG240M(root)
+    dataset = UniMP(root)
     dataset.prepare_data()
 
 
