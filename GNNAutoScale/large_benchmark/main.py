@@ -9,6 +9,7 @@ from torch_geometric_autoscale import (get_data, metis, permute,
                                        SubgraphLoader, EvalSubgraphLoader,
                                        models, compute_micro_f1, dropout)
 from torch_geometric_autoscale.data import get_ppi
+from tensorboardX import SummaryWriter
 
 torch.manual_seed(123)
 
@@ -148,6 +149,8 @@ def main(conf):
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     best_val_acc = test_acc = 0
+    swriter = SummaryWriter(os.path.join(conf.dataset.name, 'log'))
+
     for epoch in range(1, params.epochs + 1):
         loss = mini_train(model, train_loader, criterion, optimizer,
                           params.max_steps, grad_norm, edge_dropout)
@@ -163,6 +166,10 @@ def main(conf):
             val_acc = compute_micro_f1(full_test(model, val_data), val_data.y)
             tmp_test_acc = compute_micro_f1(full_test(model, test_data),
                                             test_data.y)
+
+        swriter.add_scalar('loss', loss, epoch)
+        swriter.add_scalar('val', val_acc , epoch)
+        swriter.add_scalar('test', tmp_test_acc , epoch)
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
